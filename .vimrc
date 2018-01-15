@@ -11,7 +11,8 @@ filetype plugin indent on
 let mapleader = "\<Space>" 
 
 " Show line #s
-set number
+"set number
+set relativenumber  " relative line numbers
 
 " Show file stats
 set ruler
@@ -66,19 +67,83 @@ set showmatch
 " Clear search buffer
 nmap <silent> <leader>/ :nohlsearch<CR>
 
-" Shortcuts to edit/reload vimrc file
-nmap <silent> <leader>ev :e $MYVIMRC<CR>
-nmap <silent> <leader>sv :so $MYVIMRC<CR>
-
 " Shortcut to save file
 nnoremap <leader>w :w<CR>
+
+" Status Line
+
+let g:currentmode={
+	\ 'n'  : 'Normal ',
+	\ 'no' : 'Normal - Operator Pending ',
+	\ 'v'  : 'Visual ',
+	\ 'V'  : 'Visual - Line ',
+	\ '^V' : 'Visual - Block ',
+	\ 's'  : 'Select ',
+	\ 'S'  : 'Select - Line ',
+	\ '^S' : 'Select - Block ', 
+	\ 'i'  : 'Insert ',
+	\ 'R'  : 'Replace ',
+	\ 'Rv' : 'Visual - Replace ',
+	\ 'c'  : 'Command ',
+	\ 'cv' : 'Vim Ex ',
+	\ 'ce' : 'Ex ',
+	\ 'r'  : 'Prompt ',
+	\ 'rm' : 'More  ',
+	\ 'r?' : 'Confirm ',
+	\ '!'  : 'Shell ',
+	\ 't'  : 'Terminal '
+	\}
+
+" Change statusline color depending on mode
+function! ChangeStatusLineColor()
+	if (mode() ==# 'n')
+		exe 'hi! StatusLine ctermfg=004'
+	elseif (mode() ==# 'i')
+		exe 'hi! StatusLine ctermfg=005'
+	elseif (mode() ==# 'v')
+		exe 'hi! StatusLine ctermfg=002'
+	else
+		exe 'hi! StatusLine ctermfg=007'
+	endif
+
+	return ''
+endfunction
+
+function! GitInfo()
+	let git = fugitive#head()
+	if git != ''
+		return ' '.fugitive#head()
+	else
+		return ''
+endfunction
+
+set statusline=
+set statusline+=%{ChangeStatusLineColor()}			" Change statusline color 
+set statusline+=%0*\ %{g:currentmode[mode()]}		" Current mode
+set statusline+=%4*\ %{GitInfo()}					" Git branch
+set statusline+=%1*\ %F								" Full file path 
+set statusline+=%3*\ %m								" Modified flag
+set statusline+=%=									" Right align
+set statusline+=%1*\ %y\ 							" File type 
+set statusline+=%0*\ \ %l							" Line number
+set statusline+=/%L\ 								" Total number of lines
+
+hi User1 ctermfg=007
+hi User2 ctermfg=004
+hi User3 ctermfg=005
+hi User4 ctermfg=002
+hi User5 ctermfg=007
+hi User6 ctermfg=007
+hi User7 ctermfg=007
+hi User8 ctermfg=007
+hi User9 ctermfg=007
 
 " Use pathogen to bundle plugins in ~/.vim/bundle
 call pathogen#infect()
 call pathogen#helptags()  
 
 " Color scheme
-colorscheme monokai
+"colorscheme monokai
 
 " Color scheme: solarized, *change iTerm colors to Solarized Dark
 "set t_Co=256
